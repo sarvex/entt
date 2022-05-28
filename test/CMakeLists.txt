@@ -56,8 +56,14 @@ function(SETUP_TARGET TARGET_NAME)
                 # clang-cl goes a little wrong with some warnings instead
                 $<$<STREQUAL:"${CMAKE_CXX_COMPILER_ID}","Clang">:-Wno-deprecated-declarations -Wno-ignored-qualifiers -Wno-unknown-warning-option -Wno-exceptions -Wno-unused-local-typedef -Wno-unused-private-field>
                 /EHsc /wd4324 /wd4996
-                $<$<CONFIG:Debug>:/Od>
+                $<$<CONFIG:Debug>:/Od /INCREMENTAL:NO>
                 $<$<CONFIG:Release>:/O2>
+        )
+
+        target_link_options(
+            ${TARGET_NAME}
+            PRIVATE
+                $<$<CONFIG:Debug>:/INCREMENTAL:NO>
         )
     else()
         target_compile_options(
