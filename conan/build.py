@@ -10,7 +10,7 @@ if __name__ == "__main__":
     login_username = os.getenv("CONAN_LOGIN_USERNAME")
     package_version = tag_version.replace("refs/tags/v", "")
     package_name = tag_package.replace("skypjack/", "")
-    reference = "{}/{}".format(package_name, package_version)
+    reference = f"{package_name}/{package_version}"
     channel = os.getenv("CONAN_CHANNEL", "stable")
     upload = os.getenv("CONAN_UPLOAD")
     stable_branch_pattern = os.getenv("CONAN_STABLE_BRANCH_PATTERN", r"v\d+\.\d+\.\d+.*")
@@ -28,10 +28,11 @@ if __name__ == "__main__":
                                  test_folder=test_folder)
     builder.add()
 
-    filtered_builds = []
-    for settings, options, env_vars, build_requires, reference in builder.items:
-        if disable_shared == "False" or not options["{}:shared".format(package_name)]:
-             filtered_builds.append([settings, options, env_vars, build_requires])
+    filtered_builds = [
+        [settings, options, env_vars, build_requires]
+        for settings, options, env_vars, build_requires, reference in builder.items
+        if disable_shared == "False" or not options[f"{package_name}:shared"]
+    ]
     builder.builds = filtered_builds
 
     builder.run()
